@@ -23,15 +23,13 @@ namespace ChessBoardConsole
             // Declare and initialize
             string piece = "";
             Tuple<int, int>? result;
+            BoardLogic boardLogic = new BoardLogic();
 
             // Print a welcome message for the user
             Console.WriteLine("Hello, Chess Players!");
 
             // Create a new chess board
             BoardModel board = new BoardModel(8);
-
-            // Create the business logic object
-            BoardLogic logic = new BoardLogic();
 
             // Show the empty board
             Utility.PrintBoard(board);
@@ -44,8 +42,10 @@ namespace ChessBoardConsole
             result = Utility.GetRowAndCol();
 
             // Mark the legal moves based on the input
-            CellModel currentCell = board.Grid[result.Item1, result.Item2];
-            board = logic.MarkLegalMoves(board, currentCell, piece);
+            board = boardLogic.MarkLegalMoves(
+                        board,
+                        board.Grid[result.Item1, result.Item2],
+                        piece);
 
             // Print out the new chess board
             Utility.PrintBoard(board);
@@ -97,15 +97,12 @@ namespace ChessBoardConsole
         /// </summary>
         internal static Tuple<int, int> GetRowAndCol()
         {
-            // Get the row from the user
             Console.Write("Enter the row number of the piece: ");
             int row = int.Parse(Console.ReadLine());
 
-            // Get the column from the user
             Console.Write("Enter the column number of the piece: ");
             int col = int.Parse(Console.ReadLine());
 
-            // Return the data
             return Tuple.Create(row, col);
         }
     }
