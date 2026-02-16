@@ -40,24 +40,28 @@ namespace ChessBoardClassLibrary.Services.BusinessLogicLayer
             switch (chessPiece)
             {
                 case "Knight":
-
                     board.Grid[currentCell.Row, currentCell.Column].PieceOccupyingCell = "N";
                     board = MarkValidKnightMoves(board, currentCell);
                     break;
 
                 case "Rook":
-
                     board.Grid[currentCell.Row, currentCell.Column].PieceOccupyingCell = "R";
                     board = MarkValidRookMoves(board, currentCell);
                     break;
 
                 case "Bishop":
+                    board.Grid[currentCell.Row, currentCell.Column].PieceOccupyingCell = "B";
+                    board = MarkValidBishopMoves(board, currentCell);
                     break;
 
                 case "Queen":
+                    board.Grid[currentCell.Row, currentCell.Column].PieceOccupyingCell = "Q";
+                    board = MarkValidQueenMoves(board, currentCell);
                     break;
 
                 case "King":
+                    board.Grid[currentCell.Row, currentCell.Column].PieceOccupyingCell = "K";
+                    board = MarkValidKingMoves(board, currentCell);
                     break;
 
                 default:
@@ -74,13 +78,12 @@ namespace ChessBoardClassLibrary.Services.BusinessLogicLayer
 
             for (int i = 0; i < knightRowMoves.Length; i++)
             {
-                if (IsOnBoard(board,
-                    currentCell.Row + knightRowMoves[i],
-                    currentCell.Column + knightColMoves[i]))
+                int newRow = currentCell.Row + knightRowMoves[i];
+                int newCol = currentCell.Column + knightColMoves[i];
+
+                if (IsOnBoard(board, newRow, newCol))
                 {
-                    board.Grid[currentCell.Row + knightRowMoves[i],
-                               currentCell.Column + knightColMoves[i]]
-                               .IsLegalNextMove = true;
+                    board.Grid[newRow, newCol].IsLegalNextMove = true;
                 }
             }
 
@@ -91,28 +94,66 @@ namespace ChessBoardClassLibrary.Services.BusinessLogicLayer
         {
             int size = board.Size;
 
-            // Move Up
             for (int row = currentCell.Row - 1; row >= 0; row--)
-            {
                 board.Grid[row, currentCell.Column].IsLegalNextMove = true;
-            }
 
-            // Move Down
             for (int row = currentCell.Row + 1; row < size; row++)
-            {
                 board.Grid[row, currentCell.Column].IsLegalNextMove = true;
-            }
 
-            // Move Left
             for (int col = currentCell.Column - 1; col >= 0; col--)
-            {
                 board.Grid[currentCell.Row, col].IsLegalNextMove = true;
-            }
 
-            // Move Right
             for (int col = currentCell.Column + 1; col < size; col++)
-            {
                 board.Grid[currentCell.Row, col].IsLegalNextMove = true;
+
+            return board;
+        }
+
+        private BoardModel MarkValidBishopMoves(BoardModel board, CellModel currentCell)
+        {
+            int size = board.Size;
+
+            // Top-right
+            for (int i = 1; IsOnBoard(board, currentCell.Row - i, currentCell.Column + i); i++)
+                board.Grid[currentCell.Row - i, currentCell.Column + i].IsLegalNextMove = true;
+
+            // Top-left
+            for (int i = 1; IsOnBoard(board, currentCell.Row - i, currentCell.Column - i); i++)
+                board.Grid[currentCell.Row - i, currentCell.Column - i].IsLegalNextMove = true;
+
+            // Bottom-right
+            for (int i = 1; IsOnBoard(board, currentCell.Row + i, currentCell.Column + i); i++)
+                board.Grid[currentCell.Row + i, currentCell.Column + i].IsLegalNextMove = true;
+
+            // Bottom-left
+            for (int i = 1; IsOnBoard(board, currentCell.Row + i, currentCell.Column - i); i++)
+                board.Grid[currentCell.Row + i, currentCell.Column - i].IsLegalNextMove = true;
+
+            return board;
+        }
+
+        private BoardModel MarkValidQueenMoves(BoardModel board, CellModel currentCell)
+        {
+            board = MarkValidRookMoves(board, currentCell);
+            board = MarkValidBishopMoves(board, currentCell);
+            return board;
+        }
+
+        private BoardModel MarkValidKingMoves(BoardModel board, CellModel currentCell)
+        {
+            for (int rowOffset = -1; rowOffset <= 1; rowOffset++)
+            {
+                for (int colOffset = -1; colOffset <= 1; colOffset++)
+                {
+                    if (rowOffset == 0 && colOffset == 0)
+                        continue;
+
+                    int newRow = currentCell.Row + rowOffset;
+                    int newCol = currentCell.Column + colOffset;
+
+                    if (IsOnBoard(board, newRow, newCol))
+                        board.Grid[newRow, newCol].IsLegalNextMove = true;
+                }
             }
 
             return board;
