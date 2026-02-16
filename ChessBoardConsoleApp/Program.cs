@@ -16,32 +16,45 @@ namespace ChessBoardConsole
     {
         static void Main(string[] args)
         {
-            // Print a welcome message
+            // ---------------------------------------------------------
+            // Start of Main Method
+            // ---------------------------------------------------------
+
+            // Declare and initialize
+            string piece = "";
+            Tuple<int, int>? result;
+
+            // Print a welcome message for the user
             Console.WriteLine("Hello, Chess Players!");
 
-            // Create board
+            // Create a new chess board
             BoardModel board = new BoardModel(8);
 
-            // Create logic object
+            // Create the business logic object
             BoardLogic logic = new BoardLogic();
 
-            Console.WriteLine("Enter Chess Piece (Knight, Rook, Bishop, Queen, King): ");
-            string piece = Console.ReadLine();
+            // Show the empty board
+            Utility.PrintBoard(board);
 
-            Console.WriteLine("Enter Row (0-7): ");
-            int row = int.Parse(Console.ReadLine());
+            // Prompt the user for the type of chess piece
+            Console.Write("Enter the type of piece you want to place (Knight, Rook, Bishop, Queen, King): ");
+            piece = Console.ReadLine();
 
-            Console.WriteLine("Enter Column (0-7): ");
-            int col = int.Parse(Console.ReadLine());
+            // Prompt the user for the location of the chess piece
+            result = Utility.GetRowAndCol();
 
-            CellModel currentCell = board.Grid[row, col];
-
+            // Mark the legal moves based on the input
+            CellModel currentCell = board.Grid[result.Item1, result.Item2];
             board = logic.MarkLegalMoves(board, currentCell, piece);
 
-            // Call Utility class
+            // Print out the new chess board
             Utility.PrintBoard(board);
 
             Console.ReadLine();
+
+            // ---------------------------------------------------------
+            // End of Main Method
+            // ---------------------------------------------------------
         }
     }
 
@@ -53,29 +66,22 @@ namespace ChessBoardConsole
         /// <summary>
         /// Print the given board to the console
         /// </summary>
-        /// <param name="board"></param>
         internal static void PrintBoard(BoardModel board)
         {
-            // Loop over rows
             for (int row = 0; row < board.Size; row++)
             {
-                // Loop over columns
                 for (int col = 0; col < board.Size; col++)
                 {
-                    // Get current cell
                     CellModel cell = board.Grid[row, col];
 
-                    // If legal move
                     if (cell.IsLegalNextMove)
                     {
                         Console.Write("+ ");
                     }
-                    // If piece exists
                     else if (cell.PieceOccupyingCell != "")
                     {
                         Console.Write($"{cell.PieceOccupyingCell} ");
                     }
-                    // Otherwise empty
                     else
                     {
                         Console.Write(". ");
@@ -84,6 +90,23 @@ namespace ChessBoardConsole
 
                 Console.WriteLine();
             }
+        }
+
+        /// <summary>
+        /// Get the row and column for the piece
+        /// </summary>
+        internal static Tuple<int, int> GetRowAndCol()
+        {
+            // Get the row from the user
+            Console.Write("Enter the row number of the piece: ");
+            int row = int.Parse(Console.ReadLine());
+
+            // Get the column from the user
+            Console.Write("Enter the column number of the piece: ");
+            int col = int.Parse(Console.ReadLine());
+
+            // Return the data
+            return Tuple.Create(row, col);
         }
     }
 }
